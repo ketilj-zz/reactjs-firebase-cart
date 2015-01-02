@@ -3,7 +3,6 @@ Router = require('react-router'),
 ReactFireMixin = require('reactfire'),
 FireBase = require('firebase'),
 FirebaseTokenGenerator = require("firebase-token-generator"),
-Prismic = require('../prismic-helpers'),
 _ = require('lodash'),
 
 EventEmitter = require('events').EventEmitter;
@@ -45,7 +44,6 @@ var ProductRow = React.createClass({
       // this.setState({
       //   added: !this.state.added
       // });
-      console.log("product added " + this.props.product.hardwareProduct.model);
       eventer.emit("CartItemAdded", null, this.props.product);
     },
     

@@ -3,8 +3,7 @@ var express = require('express'),
 	reactify = require('reactify'),
 	less = require('less-middleware'),
 	nunjucks = require('nunjucks'),
-	config = require('./client/config'),
-	prismic = require('prismic-helpers');
+	config = require('./client/config');
 
 // initialise express
 var app = express();
