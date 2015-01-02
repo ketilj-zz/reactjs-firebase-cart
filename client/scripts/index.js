@@ -142,48 +142,7 @@ var FilterableProductTable = React.createClass({
     return {products: [], text: ""};
   },
   componentWillMount: function() {
-    //this.bindAsArray(new Firebase("https://ketilshop.firebaseio.com/Items/"), "products");
-    // Setup our ajax request
-    // var request = new XMLHttpRequest(), self = this;
-    // request.open('JSONP', 'http://iplst01z.netcom.no:9230/pricemaster/service/hardwareListPrice/1/netcom/INT_STORE/KSA1?callback=JSON_CALLBACK&customerGroup=PC', true);
-    // request.onload = function() {
-
-    //   // If everything is cool...
-    //   if (request.status >= 200 && request.status < 400){
-
-    //     // Load our next page
-    //     self.loadProducts(JSON.parse(request.responseText));
-
-    //   } else {
-
-    //     // Set application state (Not paging, paging complete)
-    //     self.setState({paging: false, done: true});
-
-    //   }
-    // };
-
-    // // Fire!
-    // request.send();
-    Prismic.Api('https://lesbonneschoses-vjpkpyoaaccabmbn.prismic.io/api', function (err, Api) {
-    Api.form('everything')
-        .ref(Api.master())
-        .query(Prismic.Predicates.at("document.type", "product")).submit(function (err, response) {
-            if (err) {
-                console.log(err);
-                done();
-            }
-            // The documents object contains a Response object with all documents of type "product".
-            var page = response.page; // The current page number, the first one being 1
-            var results = response.results; // An array containing the results of the current page;
-            // you may need to retrieve more pages to get all results
-            var prev_page = response.prev_page; // the URL of the previous page (may be null)
-            var next_page = response.next_page; // the URL of the next page (may be null)
-            var results_per_page = response.results_per_page; // max number of results per page
-            var results_size = response.results_size; // the size of the current page
-            var total_pages = response.total_pages; // the number of pages
-            var total_results_size = response.total_results_size; // the total size of results across all pages
-        });
-}   );
+    this.bindAsArray(new Firebase("https://ketilshop.firebaseio.com/Items/"), "products");
   },
 
   componentWillUnmount: function() {
@@ -235,7 +194,7 @@ var Cart = React.createClass({
 
 
     
-    var token = tokenGenerator.createToken({uid: "4797172271", firstName: "Ketil", lastName: "Jensen"});
+    var token = tokenGenerator.createToken({uid: "4712345678", firstName: "Ketil", lastName: "Jensen"});
     console.log("token generated " + token)
     var ref = new Firebase("https://ketilshop.firebaseio.com");
 
