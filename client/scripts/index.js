@@ -1,11 +1,15 @@
 var React = require('react'),
-Router = require('react-router'),
 ReactFireMixin = require('reactfire'),
 FireBase = require('firebase'),
 FirebaseTokenGenerator = require("firebase-token-generator"),
 _ = require('lodash'),
+Prismic = require("prismic.io").Prismic,
+EventEmitter = require('events').EventEmitter,
+Router = require('react-router');
 
-EventEmitter = require('events').EventEmitter;
+var Link = Router.Link,
+    Route = Router.Route, 
+    RouteHandler = Router.RouteHandler;
 
 var eventer = new EventEmitter();
 var tokenGenerator = new FirebaseTokenGenerator("q3P7IIdyz1r8kHiL9Lk3LqKMqUJPvSgtPl6e5Kqj");
@@ -22,6 +26,7 @@ var ProductCategoryRow = React.createClass({
 
 
 var ProductRow = React.createClass({
+    mixins: [ Router.Navigation ],
 
     getInitialState: function() {
       return {
@@ -49,20 +54,22 @@ var ProductRow = React.createClass({
     
 
     render: function() {
-        var product = this.props.product;
-
-        var name = this.props.product.stocked ?
-            this.props.product.hardwareProduct.model :
-            <span style={{color: 'red'}}>
-                {this.props.product.hardwareProduct.model}
-            </span>;
+        //var product = this.props.product;
+        var name = this.props.product.slug;
+        var price = this.props.product.getNumber("product.price");
+        var image = this.props.product.getImage("product.image");
+        // var name = this.props.product.stocked ?
+        //     this.props.product.hardwareProduct.model :
+        //     <span style={{color: 'red'}}>
+        //         {this.props.product.hardwareProduct.model}
+        //     </span>;
         return (
             <div className="thumbnail">
-              <img src="" alt="product image" />
+              <img src={image.main.url} alt="product image" />
               <div className="caption clearfix">
-                <h3><a href="">{name}</a></h3>
+                <h3>{name}</h3>
                 <div className="product__price">
-                  {this.props.product.price}
+                  {price}
                 </div>
                 <div className="product__button-wrap">
                   <button className={this.state.added ? 'btn btn-danger' : 'btn btn-primary'} onClick={this.addToCart}>
@@ -76,49 +83,24 @@ var ProductRow = React.createClass({
 });
 
 var ProductsList = React.createClass({
-    render: function() {
-
-        var rows = [];
-        var lastCategory = null;
-        this.props.products.forEach(function(product) {
-            
-            rows.push(<ProductRow product={product} key={product.navn} />);
-            lastCategory = product.category;
-        });
-        return (
-            <ul className="clearfix">
-              {rows}
-            </ul>
-        );
-
-    }
-});
-
-
-/*
-var ProductTable = React.createClass({
   render: function() {
-        var rows = [];
-        var lastCategory = null;
-        this.props.products.forEach(function(product) {
-            
-            rows.push(<ProductRow product={product} key={product.navn} />);
-            lastCategory = product.category;
-        });
-        return (
-            <table>
-                <thead>
-                    <tr>
-                        <th>Navn</th>
-                        <th>Pris</th>
-                    </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </table>
-        );
-    }
+
+    var rows = [];
+    var lastCategory = null;
+    this.props.products.forEach(function(Document) {
+        
+        rows.push(<ProductRow product={Document} key={Document.slug} />);
+        //lastCategory = product.category;
+    });
+    return (
+        <ul className="clearfix">
+          {rows}
+        </ul>
+    );
+
+  }
 });
-*/
+
 var SearchBar = React.createClass({
     render: function() {
         return (
@@ -139,23 +121,67 @@ var FilterableProductTable = React.createClass({
   getInitialState: function() {
     return {products: [], text: ""};
   },
-  componentWillMount: function() {
-    this.bindAsArray(new Firebase("https://ketilshop.firebaseio.com/Items/"), "products");
+  // componentWillMount: function() {
+  //   this.bindAsArray(new Firebase("https://ketilshop.firebaseio.com/Items/"), "products");
+  // },
+
+  componentDidMount: function() {
+
+    if (this.isMounted()) {
+      console.log("mounted");
+    }
+
+    var self = this;
+    Prismic.Api('http://lesbonneschoses-vjpkpyoaaccabmbn.prismic.io/api', function (err, Api) {
+      Api.form('everything')
+        .ref(Api.master())
+        .query(Prismic.Predicates.at("document.type", "product")).submit(function (err, response) {
+            if (err) {
+                console.log(err);
+                done();
+            }
+
+            if (self.isMounted()) {
+              self.setState({
+                products: response.results
+              });
+            }
+            // The documents object contains a Response object with all documents of type "product".
+            // var page = response.page; // The current page number, the first one being 1
+            // var results = response.results; // An array containing the results of the current page;
+            // // you may need to retrieve more pages to get all results
+            // var prev_page = response.prev_page; // the URL of the previous page (may be null)
+            // var next_page = response.next_page; // the URL of the next page (may be null)
+            // var results_per_page = response.results_per_page; // max number of results per page
+            // var results_size = response.results_size; // the size of the current page
+            // var total_pages = response.total_pages; // the number of pages
+            // var total_results_size = response.total_results_size; // the total size of results across all pages
+        });
+    }.bind(this));
   },
 
   componentWillUnmount: function() {
     this.firebaseRef.off();
   },
-
-    
   
   render: function() {
         return (
-            <div className="col-md-8">
-              <h2>Produkter</h2>
-              <SearchBar />
-              <ProductsList products={this.state.products} />
-            </div>
+            
+            <div className="container">
+              <div className="row">
+                <div className="col-md-12">
+                  <h1>Nettbutikk demo</h1>
+                </div>
+              </div>
+              <div className="row">
+                 <div className="col-md-8">
+                  <h2>Produkter</h2>
+                  <SearchBar />
+                  <ProductsList products={this.state.products} />
+                </div>
+              </div>
+            </div> 
+           
         );
     },
 });
@@ -284,4 +310,4 @@ var Cart = React.createClass({
 });
 
 React.render(<FilterableProductTable/>, document.getElementById("product-listing"));
-React.render(<Cart/>, document.getElementById("shopping-cart"));
+//React.render(<Cart/>, document.getElementById("shopping-cart"));
