@@ -1,9 +1,9 @@
 var React = require('react'),
-ReactFireMixin = require('reactfire'),
-Prismic = require("prismic.io").Prismic,
+ReactFireMixin = require('reactfire'),e("prismic.io").Prismic,
 Router = require('react-router'),
 Cart = require('./cart.js'),
 ProductList = require('./productlist');
+
 
 var Link = Router.Link,
     Route = Router.Route, 
@@ -11,6 +11,7 @@ var Link = Router.Link,
 
 
 /** @jsx React.DOM */
+
 var SearchBar = React.createClass({
     render: function() {
         return (
@@ -55,28 +56,30 @@ var FilterableProductTable = React.createClass({
     }.bind(this));
   },
 
-  render: function() {
-    return (
-        
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <h1>Nettbutikk demo</h1>
-          </div>
-        </div>
-        <div className="row">
-           <div className="col-md-8">
-            <h2>Produkter</h2>
-            <SearchBar />
-            <ProductList products={this.state.products} />
-          </div>
-          <div className="col-md-4">
-            <Cart />
-          </div>
-        </div>
-      </div>   
-    );
+  componentWillUnmount: function() {
+    this.firebaseRef.off();
   },
+  
+  render: function() {
+        return (
+            
+            <div className="container">
+              <div className="row">
+                <div className="col-md-12">
+                  <h1>Nettbutikk demo</h1>
+                </div>
+              </div>
+              <div className="row">
+                 <div className="col-md-8">
+                  <h2>Produkter</h2>
+                  <SearchBar />
+                  <ProductsList products={this.state.products} />
+                </div>
+              </div>
+            </div> 
+           
+        );
+    },
 });
 
 React.render(<FilterableProductTable/>, document.getElementById("product-listing"));
