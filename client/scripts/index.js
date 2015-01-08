@@ -1,5 +1,6 @@
 var React = require('react'),
-ReactFireMixin = require('reactfire'),e("prismic.io").Prismic,
+ReactFireMixin = require('reactfire'),
+Prismic = require("prismic.io").Prismic,
 Router = require('react-router'),
 Cart = require('./cart.js'),
 ProductList = require('./productlist');
@@ -73,7 +74,10 @@ var FilterableProductTable = React.createClass({
                  <div className="col-md-8">
                   <h2>Produkter</h2>
                   <SearchBar />
-                  <ProductsList products={this.state.products} />
+                  <ProductList products={this.state.products} />
+                </div>
+                <div className="col-md-4">
+                  <Cart />
                 </div>
               </div>
             </div> 
